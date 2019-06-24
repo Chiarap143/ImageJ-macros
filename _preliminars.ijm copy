@@ -1,0 +1,10 @@
+//	Module to run with other macros when working with a multi-tiff with low signal.
+
+Stack.setDisplayMode("composite");
+run("Z Project...", "projection=[Max Intensity]");
+run("RGB Color");
+run("Brightness/Contrast...");
+waitForUser("Maximise the brightness to visualize the axon")
+setTool("polyline");
+waitForUser("Trace the axon and adjust the thickness of the line to cover it completely and then come back to your original image and restore this selection")
+run("Close");
