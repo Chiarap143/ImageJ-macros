@@ -4,34 +4,45 @@
 fullname = File.name
 name= File.nameWithoutExtension
 
+
 run("Set Measurements...", "area mean min display redirect=None decimal=3");
 run("Z Project...", "projection=[Max Intensity]");
 run("Split Channels");
 selectWindow("C2-MAX_"+fullname);
-run("In [+]");
-run("In [+]");
 run("8-bit");
 setTool("freehand");
-waitForUser("Trace the soma")
+
+state = getBoolean("Are you going to trace a neuron?");
+while (state==1) {
+selectWindow("C2-MAX_"+fullname);
+run("In [+]");
+run("In [+]");
+waitForUser("Trace the soma");
 selectWindow("C1-MAX_"+fullname);
 run("Duplicate...", "title=TrkB");
-close("C1-MAX_"+fullname)
 run("8-bit");
 run("Restore Selection");
-run("Measure")
+run("Measure");
 selectWindow("C3-MAX_"+fullname);
 run("Duplicate...", "title=CTB");
-close("C3-MAX_"+fullname)
 run("8-bit");
 run("Restore Selection");
-run("Measure")
+run("Measure");
+close("TrkB");
+close("CTB");
+selectWindow("C2-MAX_"+fullname);
+run("Out [-]");
+run("Out [-]");
+state = getBoolean("Are you going to trace a neuron?");
+	}
+if (state==0) {
 saveAs("Results", "/Users/ojerez/Desktop/"+name+".csv");
   macro "Close All Windows" { 
       while (nImages>0) { 
           selectImage(nImages); 
           close(); 
       } 
-  } 
+  }} 
 
 
 // omlazo 2019 — use, copy and distribute freely.
