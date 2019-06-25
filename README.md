@@ -1,5 +1,5 @@
 # ImageJ-macros
-Humble and customised macros for things I do using ImageJ/FIJI. Most of them have been written in modules to be remixed, combined and recycled. Feel free to do exactly that.
+Humble and customised macros for things I do using ImageJ/FIJI. Most of them have been written in modules to be remixed, combined and recycled. Feel free to do that yourself as well.
 You can put them in the folder /FIJI/plugins/macros/ to be visible from the Macros menu (the _ at the beginning of the file name is required to appear in the menu).
 Advice on how to make them better is always welcome and much appreciated.
 
