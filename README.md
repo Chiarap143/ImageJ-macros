@@ -1,7 +1,7 @@
 # ImageJ-macros
 Humble and customised macros for things I do using ImageJ/FIJI. Most of them have been written in modules to be remixed, combined and recycled. Feel free to do exactly that.
 You can put them in the folder /FIJI/plugins/macros/ to be visible from the Macros menu (the _ at the beginning of the file name is required to appear in the menu).
-Advice in how to make them better is always welcome and much appreciated.
+Advice on how to make them better is always welcome and much appreciated.
 
 ### Retrograde Accumulation 
 It guides you through the process of tracing the soma of the neuron of interest based on the EGFP channel (or equivalent marker) and then quantifies the intensity of the maximum projection in other 2 channels (in my case TrkB and CTB, for example). It gives you a file, with the same name of the reference image, containing the size of the ROI and the mean intensity for each channel.
