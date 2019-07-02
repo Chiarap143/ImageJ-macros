@@ -3,6 +3,9 @@ Humble and customised macros for things I do using ImageJ/FIJI. Most of them hav
 You can put them in the folder /FIJI/plugins/macros/ to be visible from the Macros menu (the _ at the beginning of the file name is required to appear in the menu).
 Advice on how to make them better is always welcome and much appreciated.
 
+### Rab10 in brain tissue
+It analyses z-stacks from brain tissue to answer the question: how much of Rab10 is in neurons and how much of that neuronal Rab10 is in neurons with hyperphosphorylated Tau. The macro separates the amount of Rab10 fluorescence that is in CaMKII domains, and from that, the amount that is also in AT8 positive domains too, makes 3D projection of the merge of both and a table with the intensity measurements. The process is documented in a folder containing the masks and the filtered images.
+
 ### Retrograde Accumulation 
 It guides you through the process of tracing the soma of the neuron of interest based on the EGFP channel (or equivalent marker) and then quantifies the intensity of the maximum projection in other 2 channels (in my case TrkB and CTB, for example). It gives you a file, with the same name of the reference image, containing the size of the ROI and the mean intensity for each channel.
 
