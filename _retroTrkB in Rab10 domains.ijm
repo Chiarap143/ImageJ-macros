@@ -1,101 +1,138 @@
-// 		Answers the question: What proportion of total retro-TrkB is in Rab10 positive compartments?
+// 		Answers the question: What proportion of total retro-TrkB organelles (as an area) are Rab10 positive?
 //		This macro takes a 3-channel z-stack,
 //		selects a neurite and first determine the TrkB signal that is in HcT positive fields (retro_TrkB),
 //		then select the retro_TrkB that is in Rab10-positive fields and measure total and Rab10-correlated.
 
-// If the axon is not visible, go to _preliminars.ijm
-// You select the ROI, it makes the lin an area and clears outside, makes masks of HcT and TrkB.
+fullname = File.name
+name= File.nameWithoutExtension
 
+setOption("DebugMode", true);
+setOption("BlackBackground", true);
+Stack.setDisplayMode("composite");
+run("Set Measurements...", "area mean min integrated display redirect=None decimal=3");
+run("Colors...", "foreground=white background=black selection=yellow");
+run("Options...", "iterations=1 count=1 black");
+run("Misc...", "divide=NaN");
+
+run("Z Project...", "projection=[Max Intensity]");
+run("RGB Color");
+run("Duplicate...", "title=reference");
+selectWindow("MAX_"+fullname);
+run("Close");
+selectWindow("MAX_"+fullname+" (RGB)");
+run("Close");
+run("Brightness/Contrast...");
+waitForUser("Maximise the brightness to visualize the axon");
+
+
+// 
+
+
+state = getBoolean("Do you have an axon to trace?");
+while (state==1) {
+selectWindow("reference");
 setTool("polyline");
-waitForUser("Trace the axon and adjust the thickness of the line to cover it completely")
+waitForUser("Trace an axon and adjust the thickness of the line to cover it completely");
 run("Line to Area");
+selectWindow(fullname);
+run("Restore Selection");
+run("Duplicate...", "title=subframe duplicate");
+selectWindow("subframe");
 run("Clear Outside", "stack");
 run("Split Channels");
-waitForUser("Select the HcT channel")
+
+selectWindow("C1-subframe");				//REPLACE IF TRKB IS NOT IN THE CHANNEL 1
 run("8-bit");
 run("Threshold...");
-waitForUser("Adjust the threshold")
+run("In [+]");
+run("In [+]");
+waitForUser("Adjust the threshold");
+selectWindow("C1-subframe");
 run("Convert to Mask", "method=Default background=Dark black");
-run("Save", "save=/Users/ojerez/Desktop/HcT.tif");
-selectWindow("Threshold");
+run("Duplicate...", "title=TrkB duplicate");
+selectWindow("C1-subframe");
 run("Close");
-waitForUser("Select the TrkB channel")
+
+selectWindow("C3-subframe");			//REPLACE IF HcT IS NOT IN THE CHANNEL 3
 run("8-bit");
 run("Threshold...");
-waitForUser("Adjust the threshold")
+run("In [+]");
+run("In [+]");
+waitForUser("Adjust the threshold");
+selectWindow("C3-subframe");
 run("Convert to Mask", "method=Default background=Dark black");
-run("Save", "save=/Users/ojerez/Desktop/TrkB.tif");
-selectWindow("Threshold");
+run("Duplicate...", "title=HcT duplicate");
+selectWindow("C3-subframe");
 run("Close");
 
-// It uses multiplication of images to select the pixels that are simultaneously positive for TrkB and HcT
-
-selectWindow("HcT.tif");
+// Here we create the submask for TrkB/HcT double positive area
+selectWindow("HcT");
 run("Divide...", "value=255 stack");
-selectWindow("TrkB.tif");
+selectWindow("TrkB");
 run("Divide...", "value=255 stack");
-imageCalculator("Multiply create stack", "TrkB.tif","HcT.tif");
-selectWindow("Result of TrkB.tif");
+imageCalculator("Multiply create stack", "TrkB","HcT");
+selectWindow("Result of TrkB");
 run("Multiply...", "value=255 stack");
-run("Save", "save=/Users/ojerez/Desktop/retro_TrkB.tif");
-selectWindow("HcT.tif");
-close();
-selectWindow("TrkB.tif");
-close();
+run("Duplicate...", "title=retro_TrkB duplicate");
+selectWindow("Result of TrkB");
+run("Close");
+selectWindow("HcT");
+run("Close");
+selectWindow("TrkB");
+run("Close");
 
-// It creates a mask for Rab10 signal and makes a composite of Rab10 (green) and retro-TrkB (red) masks. 
-
-waitForUser("Select the Rab10 channel")
+selectWindow("C2-subframe");			//REPLACE IF Rab10 IS NOT IN THE CHANNEL 2
 run("8-bit");
 run("Threshold...");
-waitForUser("Adjust the threshold")
+run("In [+]");
+run("In [+]");
+waitForUser("Adjust the threshold");
+selectWindow("C2-subframe");
 run("Convert to Mask", "method=Default background=Dark black");
-run("Save", "save=/Users/ojerez/Desktop/Rab10.tif");
-selectWindow("Threshold");
+run("Duplicate...", "title=Rab10 duplicate");
+selectWindow("C2-subframe");
 run("Close");
-run("Merge Channels...", "c1=retro_TrkB.tif c2=Rab10.tif create keep ignore");
-run("Save", "save=/Users/ojerez/Desktop/retroTrkBinRab10.tif");
 
-// It uses multiplication of image to select the pixels in retro-TrkB that are in Rab10 positive locations
 
-selectWindow("retro_TrkB.tif");
+run("Merge Channels...", "c1=retro_TrkB c2=Rab10 create keep ignore");
+saveAs("Tiff");
+
+// Mask selecting the pixels in retro-TrkB that are in Rab10 positive locations
+selectWindow("retro_TrkB");
 run("Divide...", "value=255 stack");
-selectWindow("Rab10.tif");
+selectWindow("Rab10");
 run("Divide...", "value=255 stack");
-imageCalculator("Multiply create stack", "retro_TrkB.tif","Rab10.tif");  // The window 'Result of retro_TrkB.tif' was created.
-selectWindow("Rab10.tif");
+imageCalculator("Multiply create stack", "retro_TrkB","Rab10");
+selectWindow("Result of retro_TrkB");
+run("Duplicate...", "title=retro_TrkBonRab10 duplicate");
+run("Multiply...", "value=255 stack");
+selectWindow("Result of retro_TrkB");
 close();
+selectWindow("Rab10");
+close();
+selectWindow("retro_TrkB");
+run("Multiply...", "value=255 stack");
 
-// It quantifies retro_TrkB and its proportion in Rab10 fields (a.k.a Result of retro_TrkB) 
-// and closes everything but the composite of retro_TrkB and Rab10 and the active table of measurements.
-
-selectWindow("retro_TrkB.tif");
-    run("Multiply...", "value=255 stack");
+// Max projection and quantification
+selectWindow("retro_TrkB");
     run("Z Project...", "projection=[Max Intensity]");
     run("Measure");
-    selectWindow("MAX_retro_TrkB.tif");
+    selectWindow("MAX_retro_TrkB");
     close();
-    selectWindow("retro_TrkB.tif");
+    selectWindow("retro_TrkB");
     close();
-selectWindow("Result of retro_TrkB.tif");
-    run("Multiply...", "value=255 stack");
+selectWindow("retro_TrkBonRab10");
     run("Z Project...", "projection=[Max Intensity]");
     run("Measure");
-    selectWindow("MAX_Result of retro_TrkB.tif");
+    selectWindow("MAX_retro_TrkBonRab10");
     close();
-    selectWindow("Result of retro_TrkB.tif");
+    selectWindow("retro_TrkBonRab10");
     close();
-saveAs("Results", "/Users/ojerez/Desktop/retro-TrkB total vs Rab10.xls");
-
-waitForUser("Take a look to the composite. Is it ok?")
-run("Close");
-
-
-
+state = getBoolean("Do you want to trace another axon?");
+	}
+if (state==0) {
+saveAs("Results", "/Users/ojerez/Desktop/"+name+".csv");
+close("*");
 
 
-
-
-
-
-// by omlazo 2018 — use, copy and distribute freely.
+// by omlazo 2020 — use, copy and distribute freely.
