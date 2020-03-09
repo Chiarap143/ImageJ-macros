@@ -52,4 +52,4 @@ saveAs("Results", "~/Desktop/"+name+".csv");
   }} 
 
 
-// omlazo 2019 — use, copy and distribute freely.
+// omlazo 2020 — use, copy and distribute freely.
